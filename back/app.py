@@ -24,29 +24,36 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 
 data = []
 
-@app.route('/send_transacoes', methods=['GET', 'POST'])
-def all_books():
+@app.route('/send_transacoes', methods=['GET'])
+def get_all_books(): 
+    response_object = {}
+
+    response_object['data'] = data
+
+    return jsonify(response_object)
+
+
+@app.route('/send_transacoes', methods=['POST'])
+def post_book():
 
     banco = creat_db()
     response_object = {}
-    if request.method == 'POST':
-        post_data = request.get_json()
-        print(post_data)
-        data.append({
-            'id': uuid.uuid4().hex,
-            'timestamp': post_data.get('timestamp'),
-            'descricao': post_data.get('descricao'),
-            'valor': post_data.get('valor'),
-            'categoria': post_data.get('categoria')
-        })
-        insert_db(banco, data[-1]['id'], data[-1]['time_stamp'], data[-1]['descricao'], data[-1]['valor'], data[-1]['categoria'])
-        banco.cursor.close()
 
-        response_object['message'] = 'Data added!'
-    else:
-        response_object['data'] = data
+    post_data = request.get_json()
+    print(post_data)
+    data.append({
+        'id': uuid.uuid4().hex,
+        'timestamp': post_data.get('timestamp'),
+        'descricao': post_data.get('descricao'),
+        'valor': post_data.get('valor'),
+        'categoria': post_data.get('categoria')
+    })
+    insert_db(banco, data[-1]['id'], data[-1]['time_stamp'], data[-1]['descricao'], data[-1]['valor'], data[-1]['categoria'])
+    banco.cursor.close()
+
+    response_object['message'] = 'Data added!'
+
     return jsonify(response_object)
-
 
 # @app.route('/send_transacoes/<transaction_id>', methods=['PUT'])
 # def single_book(book_id):
